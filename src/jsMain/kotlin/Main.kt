@@ -50,13 +50,12 @@ fun main() {
                 val send = {
                     MainScope().launch {
                         val box = document.getElementById("message_box")!! as HTMLDivElement
-                        if (box.textContent.isNullOrBlank()) {
+                        if (box.innerText.isNullOrBlank()) {
                             return@launch
                         }
-                        val content = box.textContent!!
-                        box.textContent = ""
+                        val content = box.innerText!!
+                        box.innerText = ""
                         showMessageHint(true)
-                        console.log("send msg: $content")
                         emitter.emit(Message("user", content))
                         val resp = Services.GPT.send(Message("user", content))
                         emitter.emit(Message("gpt", resp))
@@ -75,6 +74,7 @@ fun main() {
                         border(0.px)
                         color(Color("#fff"))
                         fontSize(12.pt)
+                        whiteSpace("pre-wrap")
                     }
                     onKeyUp {
                         if (it.ctrlKey && it.key == "Enter") {
@@ -86,7 +86,7 @@ fun main() {
                     }
                     onFocusOut {
                         val div = it.target as HTMLDivElement
-                        if (div.textContent.isNullOrBlank()) {
+                        if (div.innerText.isNullOrBlank()) {
                             showMessageHint(true)
                         }
                     }

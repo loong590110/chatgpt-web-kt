@@ -1,0 +1,14 @@
+div.code {
+    padding: 15px;
+    background: #222;
+    border-radius: 10px;
+}
+pre {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word;
+}

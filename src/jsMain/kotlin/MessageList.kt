@@ -17,6 +17,7 @@ fun MessageList(
 ) {
     MainScope().launch {
         emitter.filterIsInstance<Message>().collect {
+            console.log("msg: $it")
             val parent = document.getElementById("message_list")!!
             val child = document.createElement("div") as HTMLDivElement
             child.style.apply {
@@ -33,19 +34,13 @@ fun MessageList(
                 maxWidth = "80%"
                 overflowWrap = "break-word"
                 wordWrap = "break-word"
+                whiteSpace = "pre-wrap"
                 clear = "both"
                 boxShadow = "0px 0px 10px 0px rgba(0,0,0,0.25)"
             }
-            val text = it.content.trim()
-            val isXml = text.startsWith('<') && text.endsWith('>')
-            val html = eval(
-                """
-                Prism.highlight('${text.replace("'", "\\'")}', 
-                ${if (isXml) "Prism.languages.xml" else "Prism.languages.kotlin"}, 
-                ${if (isXml) "'xml'" else "'kotlin'"}
-                )""".trimIndent()
-            ) as String
-            child.innerHTML = text
+            val content = it.content.replace("<", "&lt")
+                .replace(">", "&gt")
+            child.innerHTML = MessageParser.parse(content).html
             parent.appendChild(child)
             parent.scrollTop = parent.scrollHeight.toDouble()
         }
