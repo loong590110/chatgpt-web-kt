@@ -1,15 +1,15 @@
 import kotlinx.browser.document
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.web.attributes.rows
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.keywords.auto
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
-import org.jetbrains.compose.web.dom.H4
 import org.jetbrains.compose.web.dom.Text
+import org.jetbrains.compose.web.dom.TextArea
 import org.jetbrains.compose.web.renderComposable
-import org.w3c.dom.HTMLDivElement
-import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLTextAreaElement
 
 fun main() {
     renderComposable(rootElementId = "root") {
@@ -22,10 +22,6 @@ fun main() {
                 flexDirection(FlexDirection.Column)
             }
         }) {
-            val showMessageHint = { show: Boolean ->
-                val h = document.getElementById("message_hint") as HTMLElement
-                h.style.display = if (show) "flex" else "none"
-            }
             MessageList {
                 style {
                     flex(1)
@@ -49,21 +45,18 @@ fun main() {
             }) {
                 val send = {
                     MainScope().launch {
-                        val box = document.getElementById("message_box")!! as HTMLDivElement
-                        if (box.innerText.isNullOrBlank()) {
+                        val box = document.getElementById("message_box")!! as HTMLTextAreaElement
+                        val content = box.clear()
+                        if (content.isBlank()) {
                             return@launch
                         }
-                        val content = box.innerText!!
-                        box.innerText = ""
-                        showMessageHint(true)
-                        emitter.emit(Message("user", content))
-                        val resp = Services.GPT.send(Message("user", content))
-                        emitter.emit(Message("gpt", resp))
+                        emitter.emit(Message(Role.USER, content))
+                        val resp = Services.GPT.send(content)
+                        emitter.emit(Message(Role.GPT, resp))
                     }
                 }
-                Div({
+                TextArea {
                     id("message_box")
-                    contentEditable(true)
                     style {
                         height(auto)
                         maxHeight(180.px)
@@ -75,36 +68,20 @@ fun main() {
                         color(Color("#fff"))
                         fontSize(12.pt)
                         whiteSpace("pre-wrap")
+                        property("overflow-wrap", "break-word")
+                        property("resize", "none")
                     }
-                    onKeyUp {
+                    attr("placeholder", "按下\"Ctrl+Enter\"发送")
+                    rows(1)
+                    onInput {
+                        it.target.resize()
+                    }
+                    onKeyDown {
                         if (it.ctrlKey && it.key == "Enter") {
+                            it.preventDefault()
                             send()
                         }
                     }
-                    onFocusIn {
-                        showMessageHint(false)
-                    }
-                    onFocusOut {
-                        val div = it.target as HTMLDivElement
-                        if (div.innerText.isNullOrBlank()) {
-                            showMessageHint(true)
-                        }
-                    }
-                })
-                H4({
-                    id("message_hint")
-                    style {
-                        height(36.px)
-                        position(Position.Absolute)
-                        display(DisplayStyle.Flex)
-                        alignItems(AlignItems.Center)
-                        property("margin-top", "auto")
-                        marginBottom(0.px)
-                        color(Color("#999"))
-                        property("pointer-events", "none")
-                    }
-                }) {
-                    Text("按下\"Ctrl+Enter\"发送")
                 }
                 Button(attrs = {
                     style {

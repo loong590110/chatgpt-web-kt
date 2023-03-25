@@ -5,7 +5,6 @@ object MessageParser {
         if (codeStartIndex >= codeIdentify.length) {
             val codeEndIndex = message.indexOf(codeIdentify, codeStartIndex)
             if (codeEndIndex != -1) {
-                console.log("($codeStartIndex, $codeEndIndex)")
                 val codeOrigin = message.substring(codeStartIndex, codeEndIndex)
                 val restOrigin = message.substring(codeEndIndex + codeIdentify.length)
                 val firstElement = TextElement(message.substring(0, codeStartIndex - codeIdentify.length))
@@ -23,7 +22,6 @@ object MessageParser {
         if (codeStartIndex >= codeIdentify.length) {
             val codeEndIndex = message.indexOf(codeIdentify, codeStartIndex)
             if (codeEndIndex != -1) {
-                console.log("($codeStartIndex, $codeEndIndex)")
                 val codeOrigin = message.substring(codeStartIndex, codeEndIndex)
                 val restOrigin = message.substring(codeEndIndex + codeIdentify.length)
                 val firstElement2 = TextElement(message.substring(0, codeStartIndex - codeIdentify.length))

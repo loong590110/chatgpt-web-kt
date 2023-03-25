@@ -31,12 +31,12 @@ class Services {
 
     object GPT {
         private const val url = "https://chat.landray.vip/msg"
-        suspend fun send(message: Message): String {
+        suspend fun send(message: String): String {
             return httpClient.post(url) {
                 headers {
                     set("Content-Type", "application/json")
                 }
-                setBody(Payload(token, message.content, "60"))
+                setBody(Payload(token, message, "60"))
             }.body()
         }
 

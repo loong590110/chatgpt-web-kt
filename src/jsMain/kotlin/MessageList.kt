@@ -17,7 +17,6 @@ fun MessageList(
 ) {
     MainScope().launch {
         emitter.filterIsInstance<Message>().collect {
-            console.log("msg: $it")
             val parent = document.getElementById("message_list")!!
             val child = document.createElement("div") as HTMLDivElement
             child.style.apply {
@@ -26,10 +25,10 @@ fun MessageList(
                 marginBottom = "10px"
                 padding = "10px"
                 color = "#fff"
-                background = if (it.role == "user") "#456" else "#555"
+                background = if (it.role == Role.USER) "#456" else "#555"
                 borderRadius = "10px"
                 fontSize = "10pt"
-                cssFloat = if (it.role == "user") "right" else "left"
+                cssFloat = if (it.role == Role.USER) "right" else "left"
                 width = "fit-content"
                 maxWidth = "80%"
                 overflowWrap = "break-word"
@@ -56,4 +55,6 @@ fun MessageList(
     })
 }
 
-data class Message(val role: String, val content: String)
+data class Message(val role: Role, val content: String)
+
+enum class Role { USER, GPT }
